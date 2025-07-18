@@ -4,6 +4,7 @@ import CurrentTime from './components/CurrentTime';
 import TimeBlockCard from './components/TimeBlockCard';
 import ProgressStats from './components/ProgressStats';
 import AddTaskModal from './components/AddTaskModal';
+import SyncPanel from './components/SyncPanel';
 import { useSchedule } from './hooks/useSchedule';
 
 function App() {
@@ -14,7 +15,13 @@ function App() {
     addCustomTask,
     removeCustomTask,
     resetAllTasks, 
-    getCompletionStats 
+    getCompletionStats,
+    // P2P sync
+    isSyncEnabled,
+    connectedDevices,
+    deviceInfo,
+    enableSync,
+    disableSync
   } = useSchedule();
   
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = React.useState(false);
@@ -27,6 +34,13 @@ function App() {
     }
   };
 
+  const handleToggleSync = () => {
+    if (isSyncEnabled) {
+      disableSync();
+    } else {
+      enableSync();
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-4xl">
@@ -56,6 +70,14 @@ function App() {
               resetAllTasks();
             }
           }} 
+        />
+
+        {/* Sync Panel */}
+        <SyncPanel
+          isEnabled={isSyncEnabled}
+          connectedDevices={connectedDevices}
+          deviceInfo={deviceInfo}
+          onToggleSync={handleToggleSync}
         />
 
         {/* Current Time Block Highlight */}

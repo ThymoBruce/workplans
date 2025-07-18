@@ -3,10 +3,45 @@ import { scheduleData } from '../data/schedule';
 import { TimeBlock } from '../types/schedule';
 import { getCurrentTimeInMinutes, isTimeInRange } from '../utils/timeUtils';
 import { saveScheduleData, loadScheduleData, clearScheduleData, StoredScheduleData } from '../utils/storage';
+import { useP2PSync } from './useP2PSync';
 
 export const useSchedule = () => {
   const [schedule, setSchedule] = useState<TimeBlock[]>(scheduleData);
   const [currentTimeBlock, setCurrentTimeBlock] = useState<TimeBlock | null>(null);
+
+  // Handle incoming sync data
+  const handleSyncDataReceived = (syncData: StoredScheduleData) => {
+    setSchedule(prevSchedule => {
+      let updatedSchedule = scheduleData.map(block => ({
+        ...block,
+        tasks: block.tasks.map(task => ({
+          ...task,
+          completed: syncData.completedTasks.includes(task.id)
+        }))
+      }));
+
+      // Add custom tasks from sync
+      syncData.customTasks.forEach(({ timeBlockId, task }) => {
+        updatedSchedule = updatedSchedule.map(block =>
+          block.id === timeBlockId
+            ? { ...block, tasks: [...block.tasks.filter(t => t.id !== task.id), task] }
+            : block
+        );
+      });
+
+      return updatedSchedule;
+    });
+  };
+
+  // Initialize P2P sync
+  const {
+    isEnabled: isSyncEnabled,
+    connectedDevices,
+    deviceInfo,
+    enableSync,
+    disableSync,
+    broadcastUpdate
+  } = useP2PSync(schedule, handleSyncDataReceived);
 
   // Load saved data on component mount
   useEffect(() => {
@@ -60,12 +95,17 @@ export const useSchedule = () => {
       };
 
       saveScheduleData(dataToSave);
+      
+      // Broadcast update to connected devices
+      if (isSyncEnabled) {
+        broadcastUpdate(dataToSave);
+      }
     };
 
     // Debounce saving to avoid excessive localStorage writes
     const timeoutId = setTimeout(saveData, 500);
     return () => clearTimeout(timeoutId);
-  }, [schedule]);
+  }, [schedule, isSyncEnabled, broadcastUpdate]);
 
   useEffect(() => {
     const updateCurrentTimeBlock = () => {
@@ -156,6 +196,12 @@ export const useSchedule = () => {
     addCustomTask,
     removeCustomTask,
     resetAllTasks,
-    getCompletionStats
+    getCompletionStats,
+    // P2P sync functionality
+    isSyncEnabled,
+    connectedDevices,
+    deviceInfo,
+    enableSync,
+    disableSync
   };
 };
