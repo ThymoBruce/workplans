@@ -46,7 +46,29 @@ export const useSchedule = () => {
     enableSync,
     disableSync,
     broadcastUpdate
-  } = useP2PSync(schedule, handleSyncDataReceived);
+  } = useP2PSync(() => {
+    // Return current schedule data for sync
+    const completedTasks = schedule
+      .flatMap(block => block.tasks)
+      .filter(task => task.completed)
+      .map(task => task.id);
+
+    const customTasks = schedule
+      .flatMap(block => 
+        block.tasks
+          .filter(task => task.isCustom)
+          .map(task => ({
+            timeBlockId: block.id,
+            task
+          }))
+      );
+
+    return {
+      completedTasks,
+      customTasks,
+      lastUpdated: new Date().toISOString()
+    };
+  }, handleSyncDataReceived);
 
   // Initialize device linking
   const {
@@ -56,6 +78,14 @@ export const useSchedule = () => {
     unlinkDevice,
     isDeviceLinked
   } = useDeviceLinking(deviceId, deviceName, handleSyncDataReceived);
+
+  // Update P2P sync with linked device IDs whenever they change
+  useEffect(() => {
+    if (p2pSyncRef.current) {
+      const linkedDeviceIds = linkedDevices.map(device => device.deviceId);
+      p2pSyncRef.current.setLinkedDevices(linkedDeviceIds);
+    }
+  }, [linkedDevices]);
 
   // Load saved data on component mount
   useEffect(() => {

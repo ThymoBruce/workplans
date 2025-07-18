@@ -3,13 +3,19 @@ import { P2PSync, ConnectedDevice } from '../utils/p2pSync';
 import { StoredScheduleData } from '../utils/storage';
 
 export const useP2PSync = (
-  scheduleData: any,
+  getCurrentData: () => any,
   onDataReceived: (data: StoredScheduleData) => void
 ) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [connectedDevices, setConnectedDevices] = useState<ConnectedDevice[]>([]);
   const [deviceInfo, setDeviceInfo] = useState<{ id: string; name: string } | null>(null);
   const p2pSyncRef = useRef<P2PSync | null>(null);
+  const getCurrentDataRef = useRef(getCurrentData);
+
+  // Update the ref when getCurrentData changes
+  useEffect(() => {
+    getCurrentDataRef.current = getCurrentData;
+  }, [getCurrentData]);
 
   useEffect(() => {
     const handleDataReceived = (data: StoredScheduleData) => {
@@ -41,6 +47,9 @@ export const useP2PSync = (
     );
 
     setDeviceInfo(p2pSyncRef.current.getDeviceInfo());
+    
+    // Set the callback to get current data
+    p2pSyncRef.current.setCurrentDataCallback(() => getCurrentDataRef.current());
 
     return () => {
       if (p2pSyncRef.current) {

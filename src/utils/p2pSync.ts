@@ -241,8 +241,14 @@ export class P2PSync {
   }
 
   private getCurrentData(): any {
-    // This will be called from the hook to get current schedule data
-    return {};
+    // Get current data from the schedule
+    return this.currentDataCallback ? this.currentDataCallback() : {};
+  }
+
+  private currentDataCallback: (() => any) | null = null;
+
+  public setCurrentDataCallback(callback: () => any): void {
+    this.currentDataCallback = callback;
   }
 
   private startDeviceDiscovery(): void {
