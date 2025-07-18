@@ -20,16 +20,16 @@ const TimeBlockCard: React.FC<TimeBlockCardProps> = ({
 
   return (
     <div className={`
-      bg-white rounded-xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl
+      bg-white rounded-xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl active:scale-[0.98] sm:active:scale-105
       ${isActive 
-        ? 'border-blue-500 ring-2 ring-blue-200 scale-105' 
+        ? 'border-blue-500 ring-2 ring-blue-200 sm:scale-105' 
         : timeBlock.isRecurring 
           ? 'border-orange-200 hover:border-orange-300' 
           : 'border-gray-200 hover:border-gray-300'
       }
     `}>
       <div className={`
-        p-4 rounded-t-xl
+        p-3 sm:p-4 rounded-t-xl
         ${isActive 
           ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' 
           : timeBlock.isRecurring 
@@ -37,25 +37,25 @@ const TimeBlockCard: React.FC<TimeBlockCardProps> = ({
             : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800'
         }
       `}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span className="text-2xl">{timeBlock.emoji}</span>
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-2 sm:space-x-3 flex-1 min-w-0">
+            <span className="text-xl sm:text-2xl flex-shrink-0">{timeBlock.emoji}</span>
             <div>
-              <h3 className="font-semibold text-lg">{timeBlock.title}</h3>
-              <p className="text-sm opacity-90">
+              <h3 className="font-semibold text-base sm:text-lg leading-tight pr-2">{timeBlock.title}</h3>
+              <p className="text-xs sm:text-sm opacity-90 mt-1">
                 {timeBlock.startTime} – {timeBlock.endTime}
               </p>
             </div>
           </div>
           {isActive && (
-            <div className="bg-white bg-opacity-20 rounded-full px-3 py-1">
-              <span className="text-xs font-medium">ACTIEF</span>
+            <div className="bg-white bg-opacity-20 rounded-full px-2 sm:px-3 py-1 flex-shrink-0">
+              <span className="text-xs font-medium whitespace-nowrap">ACTIEF</span>
             </div>
           )}
         </div>
         
         {totalTasks > 0 && (
-          <div className="mt-3">
+          <div className="mt-3 sm:mt-3">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs opacity-90">Voortgang</span>
               <span className="text-xs opacity-90">{completedTasks}/{totalTasks}</span>
@@ -70,9 +70,9 @@ const TimeBlockCard: React.FC<TimeBlockCardProps> = ({
         )}
       </div>
 
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {timeBlock.tasks.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-1 sm:space-y-2">
             {timeBlock.tasks.map((task) => (
               <TaskItem 
                 key={task.id} 
@@ -82,14 +82,14 @@ const TimeBlockCard: React.FC<TimeBlockCardProps> = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-4 text-gray-500">
+          <div className="text-center py-3 sm:py-4 text-gray-500">
             <span className="text-sm">Geen specifieke taken</span>
           </div>
         )}
 
-        <div className="mt-4 pt-4 border-t border-gray-100">
+        <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">
           <div className="flex items-start space-x-2">
-            <Info className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+            <Info className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 mt-0.5 flex-shrink-0" />
             <div className="text-xs text-gray-600">
               <p className="mb-1">
                 <strong>Waarom:</strong> {timeBlock.why}
