@@ -60,16 +60,6 @@ const LinkedDevicesPanel: React.FC<LinkedDevicesPanelProps> = ({
         </button>
       </div>
 
-      {/* Current Device */}
-      <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-        <div className="flex items-center space-x-2 mb-2">
-          <Smartphone className="h-4 w-4 text-blue-600" />
-          <span className="text-sm font-medium text-blue-800">Dit Apparaat</span>
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-        </div>
-        <p className="text-sm text-blue-700">{deviceName}</p>
-      </div>
-
       {/* Linked Devices */}
       {linkedDevices.length > 0 ? (
         <div className="space-y-3">

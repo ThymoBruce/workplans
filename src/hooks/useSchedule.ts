@@ -81,11 +81,12 @@ export const useSchedule = () => {
 
   // Update P2P sync with linked device IDs whenever they change
   useEffect(() => {
-    if (p2pSyncRef.current) {
+    const p2pSync = getP2PSyncInstance();
+    if (p2pSync) {
       const linkedDeviceIds = linkedDevices.map(device => device.deviceId);
-      p2pSyncRef.current.setLinkedDevices(linkedDeviceIds);
+      p2pSync.setLinkedDevices(linkedDeviceIds);
     }
-  }, [linkedDevices]);
+  }, [linkedDevices, getP2PSyncInstance]);
 
   // Load saved data on component mount
   useEffect(() => {

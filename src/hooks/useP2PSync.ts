@@ -79,12 +79,16 @@ export const useP2PSync = (
     }
   };
 
+  // Expose the P2P sync instance
+  const getP2PSyncInstance = () => p2pSyncRef.current;
+
   return {
     isEnabled,
     connectedDevices,
     deviceInfo,
     enableSync,
     disableSync,
-    broadcastUpdate
+    broadcastUpdate,
+    getP2PSyncInstance
   };
 };

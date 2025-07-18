@@ -48,17 +48,6 @@ const SyncPanel: React.FC<SyncPanelProps> = ({
         </button>
       </div>
 
-      {deviceInfo && (
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-          <div className="flex items-center space-x-2 mb-2">
-            <Smartphone className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium text-blue-800">Dit Apparaat</span>
-          </div>
-          <p className="text-sm text-blue-700">{deviceInfo.name}</p>
-          <p className="text-xs text-blue-600 font-mono">{deviceInfo.id}</p>
-        </div>
-      )}
-
       {isEnabled && (
         <div>
           <div className="flex items-center space-x-2 mb-3">
