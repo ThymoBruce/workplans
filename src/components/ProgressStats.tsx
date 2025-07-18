@@ -42,7 +42,7 @@ const ProgressStats: React.FC<ProgressStatsProps> = ({ stats, onReset }) => {
           <button
             onClick={onReset}
             className="p-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-full transition-colors duration-200 touch-manipulation"
-            title="Reset alle taken"
+            title="Reset alle taken (wist ook opgeslagen voortgang)"
           >
             <RotateCcw className="h-5 w-5 text-gray-600" />
           </button>

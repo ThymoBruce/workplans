@@ -49,7 +49,14 @@ function App() {
         <CurrentTime />
 
         {/* Progress Stats */}
-        <ProgressStats stats={stats} onReset={resetAllTasks} />
+        <ProgressStats 
+          stats={stats} 
+          onReset={() => {
+            if (confirm('Weet je zeker dat je alle voortgang wilt resetten? Dit kan niet ongedaan worden gemaakt.')) {
+              resetAllTasks();
+            }
+          }} 
+        />
 
         {/* Current Time Block Highlight */}
         {currentTimeBlock && (

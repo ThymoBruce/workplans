@@ -2,10 +2,70 @@ import { useState, useEffect } from 'react';
 import { scheduleData } from '../data/schedule';
 import { TimeBlock } from '../types/schedule';
 import { getCurrentTimeInMinutes, isTimeInRange } from '../utils/timeUtils';
+import { saveScheduleData, loadScheduleData, clearScheduleData, StoredScheduleData } from '../utils/storage';
 
 export const useSchedule = () => {
   const [schedule, setSchedule] = useState<TimeBlock[]>(scheduleData);
   const [currentTimeBlock, setCurrentTimeBlock] = useState<TimeBlock | null>(null);
+
+  // Load saved data on component mount
+  useEffect(() => {
+    const savedData = loadScheduleData();
+    if (savedData) {
+      setSchedule(prevSchedule => {
+        let updatedSchedule = prevSchedule.map(block => ({
+          ...block,
+          tasks: block.tasks.map(task => ({
+            ...task,
+            completed: savedData.completedTasks.includes(task.id)
+          }))
+        }));
+
+        // Add custom tasks
+        savedData.customTasks.forEach(({ timeBlockId, task }) => {
+          updatedSchedule = updatedSchedule.map(block =>
+            block.id === timeBlockId
+              ? { ...block, tasks: [...block.tasks, task] }
+              : block
+          );
+        });
+
+        return updatedSchedule;
+      });
+    }
+  }, []);
+
+  // Save data whenever schedule changes
+  useEffect(() => {
+    const saveData = () => {
+      const completedTasks = schedule
+        .flatMap(block => block.tasks)
+        .filter(task => task.completed)
+        .map(task => task.id);
+
+      const customTasks = schedule
+        .flatMap(block => 
+          block.tasks
+            .filter(task => task.isCustom)
+            .map(task => ({
+              timeBlockId: block.id,
+              task
+            }))
+        );
+
+      const dataToSave: StoredScheduleData = {
+        completedTasks,
+        customTasks,
+        lastUpdated: new Date().toISOString()
+      };
+
+      saveScheduleData(dataToSave);
+    };
+
+    // Debounce saving to avoid excessive localStorage writes
+    const timeoutId = setTimeout(saveData, 500);
+    return () => clearTimeout(timeoutId);
+  }, [schedule]);
 
   useEffect(() => {
     const updateCurrentTimeBlock = () => {
@@ -65,6 +125,7 @@ export const useSchedule = () => {
   };
 
   const resetAllTasks = () => {
+    clearScheduleData();
     setSchedule(prevSchedule =>
       prevSchedule.map(block => ({
         ...block,
