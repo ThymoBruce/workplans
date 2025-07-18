@@ -5,6 +5,8 @@ import TimeBlockCard from './components/TimeBlockCard';
 import ProgressStats from './components/ProgressStats';
 import AddTaskModal from './components/AddTaskModal';
 import SyncPanel from './components/SyncPanel';
+import LinkedDevicesPanel from './components/LinkedDevicesPanel';
+import DeviceLinkingModal from './components/DeviceLinkingModal';
 import { useSchedule } from './hooks/useSchedule';
 
 function App() {
@@ -21,10 +23,17 @@ function App() {
     connectedDevices,
     deviceInfo,
     enableSync,
-    disableSync
+    disableSync,
+    // Device linking
+    linkedDevices,
+    generateLinkCode,
+    linkWithCode,
+    unlinkDevice,
+    deviceName
   } = useSchedule();
   
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = React.useState(false);
+  const [isLinkingModalOpen, setIsLinkingModalOpen] = React.useState(false);
 
   const stats = getCompletionStats();
 
@@ -41,6 +50,13 @@ function App() {
       enableSync();
     }
   };
+
+  const handleUnlinkDevice = (deviceId: string) => {
+    if (confirm('Weet je zeker dat je dit apparaat wilt ontkoppelen?')) {
+      unlinkDevice(deviceId);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-4xl">
@@ -78,6 +94,14 @@ function App() {
           connectedDevices={connectedDevices}
           deviceInfo={deviceInfo}
           onToggleSync={handleToggleSync}
+        />
+
+        {/* Linked Devices Panel */}
+        <LinkedDevicesPanel
+          linkedDevices={linkedDevices}
+          onAddDevice={() => setIsLinkingModalOpen(true)}
+          onUnlinkDevice={handleUnlinkDevice}
+          deviceName={deviceName}
         />
 
         {/* Current Time Block Highlight */}
@@ -130,6 +154,15 @@ function App() {
         onClose={() => setIsAddTaskModalOpen(false)}
         onAddTask={handleAddTask}
         timeBlockTitle={currentTimeBlock?.title || ''}
+      />
+
+      {/* Device Linking Modal */}
+      <DeviceLinkingModal
+        isOpen={isLinkingModalOpen}
+        onClose={() => setIsLinkingModalOpen(false)}
+        onGenerateCode={generateLinkCode}
+        onLinkWithCode={linkWithCode}
+        deviceName={deviceName}
       />
     </div>
   );

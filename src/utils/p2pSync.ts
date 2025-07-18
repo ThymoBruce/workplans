@@ -34,6 +34,7 @@ export class P2PSync {
   private onDeviceDisconnected: (deviceId: string) => void;
   private broadcastChannel: BroadcastChannel;
   private isEnabled: boolean = false;
+  private linkedDeviceIds: Set<string> = new Set();
 
   constructor(
     onDataReceived: (data: any) => void,
@@ -49,6 +50,10 @@ export class P2PSync {
     
     this.setupBroadcastChannel();
     this.startDeviceDiscovery();
+  }
+
+  public setLinkedDevices(deviceIds: string[]): void {
+    this.linkedDeviceIds = new Set(deviceIds);
   }
 
   private generateDeviceId(): string {
@@ -88,6 +93,9 @@ export class P2PSync {
 
   private async handleDeviceDiscovery(message: SyncMessage): Promise<void> {
     if (!this.isEnabled) return;
+    
+    // Only connect to linked devices
+    if (!this.linkedDeviceIds.has(message.deviceId)) return;
 
     // Respond to device discovery
     this.broadcastChannel.postMessage({
@@ -105,6 +113,9 @@ export class P2PSync {
 
   private async handleDeviceResponse(message: SyncMessage): Promise<void> {
     if (!this.isEnabled) return;
+    
+    // Only connect to linked devices
+    if (!this.linkedDeviceIds.has(message.deviceId)) return;
 
     if (!this.connectedDevices.has(message.deviceId)) {
       await this.establishConnection(message.deviceId, message.deviceName, true);

@@ -4,10 +4,15 @@ import { TimeBlock } from '../types/schedule';
 import { getCurrentTimeInMinutes, isTimeInRange } from '../utils/timeUtils';
 import { saveScheduleData, loadScheduleData, clearScheduleData, StoredScheduleData } from '../utils/storage';
 import { useP2PSync } from './useP2PSync';
+import { useDeviceLinking } from './useDeviceLinking';
 
 export const useSchedule = () => {
   const [schedule, setSchedule] = useState<TimeBlock[]>(scheduleData);
   const [currentTimeBlock, setCurrentTimeBlock] = useState<TimeBlock | null>(null);
+  
+  // Generate device info
+  const deviceId = `device-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const deviceName = `Werkplanning ${new Date().toLocaleDateString('nl-NL')}`;
 
   // Handle incoming sync data
   const handleSyncDataReceived = (syncData: StoredScheduleData) => {
@@ -37,11 +42,20 @@ export const useSchedule = () => {
   const {
     isEnabled: isSyncEnabled,
     connectedDevices,
-    deviceInfo,
+    deviceInfo: p2pDeviceInfo,
     enableSync,
     disableSync,
     broadcastUpdate
   } = useP2PSync(schedule, handleSyncDataReceived);
+
+  // Initialize device linking
+  const {
+    linkedDevices,
+    generateLinkCode,
+    linkWithCode,
+    unlinkDevice,
+    isDeviceLinked
+  } = useDeviceLinking(deviceId, deviceName, handleSyncDataReceived);
 
   // Load saved data on component mount
   useEffect(() => {
@@ -200,8 +214,15 @@ export const useSchedule = () => {
     // P2P sync functionality
     isSyncEnabled,
     connectedDevices,
-    deviceInfo,
+    deviceInfo: p2pDeviceInfo,
     enableSync,
-    disableSync
+    disableSync,
+    // Device linking functionality
+    linkedDevices,
+    generateLinkCode,
+    linkWithCode,
+    unlinkDevice,
+    isDeviceLinked,
+    deviceName
   };
 };
