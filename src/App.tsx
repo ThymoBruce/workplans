@@ -3,6 +3,7 @@ import { Calendar } from 'lucide-react';
 import CurrentTime from './components/CurrentTime';
 import TimeBlockCard from './components/TimeBlockCard';
 import ProgressStats from './components/ProgressStats';
+import AddTaskModal from './components/AddTaskModal';
 import { useSchedule } from './hooks/useSchedule';
 
 function App() {
@@ -10,11 +11,21 @@ function App() {
     schedule, 
     currentTimeBlock, 
     toggleTask, 
+    addCustomTask,
+    removeCustomTask,
     resetAllTasks, 
     getCompletionStats 
   } = useSchedule();
+  
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = React.useState(false);
 
   const stats = getCompletionStats();
+
+  const handleAddTask = (taskText: string) => {
+    if (currentTimeBlock) {
+      addCustomTask(currentTimeBlock.id, taskText);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -51,6 +62,8 @@ function App() {
               timeBlock={currentTimeBlock}
               isActive={true}
               onTaskToggle={toggleTask}
+              onAddTask={() => setIsAddTaskModalOpen(true)}
+              onRemoveTask={removeCustomTask}
             />
           </div>
         )}
@@ -67,6 +80,8 @@ function App() {
                 timeBlock={timeBlock}
                 isActive={currentTimeBlock?.id === timeBlock.id}
                 onTaskToggle={toggleTask}
+                onAddTask={currentTimeBlock?.id === timeBlock.id ? () => setIsAddTaskModalOpen(true) : undefined}
+                onRemoveTask={removeCustomTask}
               />
             ))}
           </div>
@@ -79,6 +94,14 @@ function App() {
           </p>
         </div>
       </div>
+
+      {/* Add Task Modal */}
+      <AddTaskModal
+        isOpen={isAddTaskModalOpen}
+        onClose={() => setIsAddTaskModalOpen(false)}
+        onAddTask={handleAddTask}
+        timeBlockTitle={currentTimeBlock?.title || ''}
+      />
     </div>
   );
 }

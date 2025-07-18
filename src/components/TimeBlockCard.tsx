@@ -1,5 +1,5 @@
 import React from 'react';
-import { Info } from 'lucide-react';
+import { Info, Plus } from 'lucide-react';
 import { TimeBlock } from '../types/schedule';
 import TaskItem from './TaskItem';
 
@@ -7,16 +7,21 @@ interface TimeBlockCardProps {
   timeBlock: TimeBlock;
   isActive: boolean;
   onTaskToggle: (taskId: string) => void;
+  onAddTask?: () => void;
+  onRemoveTask?: (taskId: string) => void;
 }
 
 const TimeBlockCard: React.FC<TimeBlockCardProps> = ({ 
   timeBlock, 
   isActive, 
-  onTaskToggle 
+  onTaskToggle,
+  onAddTask,
+  onRemoveTask
 }) => {
   const completedTasks = timeBlock.tasks.filter(task => task.completed).length;
   const totalTasks = timeBlock.tasks.length;
   const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+  const hasCustomTasks = timeBlock.tasks.some(task => task.isCustom);
 
   return (
     <div className={`
@@ -47,11 +52,22 @@ const TimeBlockCard: React.FC<TimeBlockCardProps> = ({
               </p>
             </div>
           </div>
-          {isActive && (
-            <div className="bg-white bg-opacity-20 rounded-full px-2 sm:px-3 py-1 flex-shrink-0">
-              <span className="text-xs font-medium whitespace-nowrap">ACTIEF</span>
-            </div>
-          )}
+          <div className="flex items-center space-x-2">
+            {isActive && onAddTask && (
+              <button
+                onClick={onAddTask}
+                className="bg-white bg-opacity-20 hover:bg-opacity-30 active:bg-opacity-40 rounded-full p-2 transition-all duration-200 touch-manipulation"
+                title="Taak toevoegen"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            )}
+            {isActive && (
+              <div className="bg-white bg-opacity-20 rounded-full px-2 sm:px-3 py-1 flex-shrink-0">
+                <span className="text-xs font-medium whitespace-nowrap">ACTIEF</span>
+              </div>
+            )}
+          </div>
         </div>
         
         {totalTasks > 0 && (
@@ -78,12 +94,30 @@ const TimeBlockCard: React.FC<TimeBlockCardProps> = ({
                 key={task.id} 
                 task={task} 
                 onToggle={onTaskToggle} 
+                onRemove={task.isCustom ? onRemoveTask : undefined}
               />
             ))}
           </div>
         ) : (
           <div className="text-center py-3 sm:py-4 text-gray-500">
             <span className="text-sm">Geen specifieke taken</span>
+            {isActive && onAddTask && (
+              <button
+                onClick={onAddTask}
+                className="block mx-auto mt-2 px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 active:bg-blue-300 text-blue-700 rounded-full transition-colors duration-200 touch-manipulation"
+              >
+                + Taak toevoegen
+              </button>
+            )}
+          </div>
+        )}
+
+        {hasCustomTasks && (
+          <div className="mt-2 pt-2 border-t border-blue-100">
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-xs text-blue-600 font-medium">Aangepaste taken</span>
+            </div>
           </div>
         )}
 

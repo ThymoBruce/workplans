@@ -38,14 +38,42 @@ export const useSchedule = () => {
     );
   };
 
+  const addCustomTask = (timeBlockId: string, taskText: string) => {
+    const customTask = {
+      id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      text: taskText,
+      completed: false,
+      isCustom: true
+    };
+
+    setSchedule(prevSchedule =>
+      prevSchedule.map(block =>
+        block.id === timeBlockId
+          ? { ...block, tasks: [...block.tasks, customTask] }
+          : block
+      )
+    );
+  };
+
+  const removeCustomTask = (taskId: string) => {
+    setSchedule(prevSchedule =>
+      prevSchedule.map(block => ({
+        ...block,
+        tasks: block.tasks.filter(task => task.id !== taskId)
+      }))
+    );
+  };
+
   const resetAllTasks = () => {
     setSchedule(prevSchedule =>
       prevSchedule.map(block => ({
         ...block,
-        tasks: block.tasks.map(task => ({
-          ...task,
-          completed: false
-        }))
+        tasks: block.tasks
+          .filter(task => !task.isCustom)
+          .map(task => ({
+            ...task,
+            completed: false
+          }))
       }))
     );
   };
@@ -64,6 +92,8 @@ export const useSchedule = () => {
     schedule,
     currentTimeBlock,
     toggleTask,
+    addCustomTask,
+    removeCustomTask,
     resetAllTasks,
     getCompletionStats
   };
