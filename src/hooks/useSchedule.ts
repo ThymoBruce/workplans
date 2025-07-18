@@ -45,7 +45,8 @@ export const useSchedule = () => {
     deviceInfo: p2pDeviceInfo,
     enableSync,
     disableSync,
-    broadcastUpdate
+    broadcastUpdate,
+    getP2PSyncInstance
   } = useP2PSync(() => {
     // Return current schedule data for sync
     const completedTasks = schedule
